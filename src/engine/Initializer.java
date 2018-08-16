@@ -3,6 +3,7 @@ package engine;
 import engine.components.Component;
 import engine.components.Keyboard;
 import engine.components.Mouse;
+import engine.connection.ConnectionSystem;
 import engine.console.ConsoleManager;
 import engine.filesystem.FileSystem;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class Initializer {
     private Keyboard keyboard = null;
     private SoundSystem soundSystem = null;
     private PhysicSystem physicSystem = null;
+    private ConnectionSystem connectionSystem = null;
 
     private float timestamp;
 
@@ -128,12 +130,17 @@ public class Initializer {
 
     public void initializeConsole(ConsoleManager consoleManager) {
         this.consoleManager = consoleManager;
-        ConsoleManager.writeOnConsole(null, "Initializer has been initialized!");
+        ConsoleManager.writeOnConsole(null, "ConsoleManager has been initialized!");
     }
 
     public void initializeConsole() {
         this.consoleManager = new ConsoleManager(this);
-        ConsoleManager.writeOnConsole(null, "Initializer has been initialized!");
+        ConsoleManager.writeOnConsole(null, "ConsoleManager has been initialized!");
+    }
+    
+    public void initializeConnectionSystem(){
+        this.connectionSystem = new ConnectionSystem();
+        ConsoleManager.writeOnConsole(null, "ConnectionSystem has been initialized!");
     }
 
     public PhysicSystem getPhysicSystem() {
@@ -162,6 +169,10 @@ public class Initializer {
 
     public ConsoleManager getConsoleManager() {
         return consoleManager;
+    }
+    
+    public ConnectionSystem getConnectionSystem(){
+        return connectionSystem;
     }
 
 }

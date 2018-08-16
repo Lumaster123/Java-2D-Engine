@@ -17,6 +17,7 @@ public class ConsoleManager {
     private static HashMap<String,Command> commands;
     
     private static boolean bool_isReady = false;
+    private static boolean bool_sendNoConsoleMessage = false;
     
     public ConsoleManager(Initializer initializer){
         this.initializer = initializer;
@@ -105,7 +106,10 @@ public class ConsoleManager {
     private static boolean isReady(){
         if(bool_isReady)
             return true;
-        System.out.println("[ConsoleManager] Error while using the Console: you have to initialize first!");
+        if(!bool_sendNoConsoleMessage){
+            System.out.println("[ConsoleManager] The console hasn't been initialized, messages are only visible in the in-build-console!");
+            bool_sendNoConsoleMessage = true;
+        }
         return false;
     }    
 
