@@ -31,7 +31,7 @@ public class ConnectionSystem {
     public ConnectionSystem(){
         try {
             state = ConnectionState.NOT_CONNECTED;
-            server_port = 78475;
+            server_port = 38475;
             this.server_address = InetAddress.getLocalHost();
             client = new Socket();
         } catch (UnknownHostException ex) {
@@ -64,7 +64,7 @@ public class ConnectionSystem {
                 client = new Socket(server_address, server_port);
                 state = ConnectionState.CONNECTING;
             } catch (IOException ex) {
-                Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
+                ConsoleManager.writeOnConsole(prefix, "The Connection could not be created! Cannot open a connection without a server at the server_addres and server_port!");
             }
         }
     }

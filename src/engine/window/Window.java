@@ -8,14 +8,13 @@ package engine.window;
 import engine.ThreadHandler;
 import engine.Time;
 import engine.filesystem.FileSystem;
-import engine.rendering.Renderable;
-import engine.rendering.Renderer;
 import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 import javax.swing.JFrame;
 
 /**
@@ -52,7 +51,10 @@ public class Window extends JFrame {
     private int defaultWidth = 1920;
     private int defaultHeight = 1080;
 
+    private ArrayList<WindowResizedListener> windowResizedListener;
+    
     public Window(Window_Size size, String title, String iconPath) {
+        windowResizedListener = new ArrayList<>();
         windowSize = size;
         setFrameOptions(size, title, iconPath);
 
@@ -77,7 +79,7 @@ public class Window extends JFrame {
 
         } else if (size == Window_Size.FULL_SIZE) {
             getContentPane().setPreferredSize(new Dimension(widthScreen - 50, heightScreen - 100));
-
+            setMinimumSize(new Dimension(WIDTH, HEIGHT));
             setUndecorated(false);
             setDefaultLookAndFeelDecorated(false);
             setExtendedState(MAXIMIZED_BOTH);
@@ -105,6 +107,8 @@ public class Window extends JFrame {
         winResizedWidth = getWidth();
         winResizedHeight = getHeight();
 
+        Window window = this;
+        
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -125,7 +129,11 @@ public class Window extends JFrame {
 //                        heightBefore = getHeight();
                         defaultWidth = getContentPane().getWidth();
                         defaultHeight = getContentPane().getHeight();
-
+                        
+                        for(WindowResizedListener l : windowResizedListener){
+                            l.windowResized(window);
+                        }
+                        
                     }
                 });
 
@@ -143,8 +151,24 @@ public class Window extends JFrame {
         System.out.println(defaultHeight);
     }
 
+    public void update(){
+//        repaint();
+        ThreadHandler.invoke("windowUpdateRecursionKiller", new Runnable() {
+            @Override
+            public void run() {
+                update();
+            }
+        });
+        Time.sleep(10);
+        ThreadHandler.killThread("windowUpdateRecursionKiller");
+//        setVisible(false);
+//        setVisible(true);
+    }
+    
     public void addWindowPanel(WindowPanel panel){
-        add(panel);
+        panel.setSize(getContentPane().getWidth(), getContentPane().getHeight());
+        setContentPane(panel);
+        
     }
     
     public int getDefaultWidth() {
@@ -155,6 +179,10 @@ public class Window extends JFrame {
         return defaultHeight;
     }
 
+    public void addWindowResizedListener(WindowResizedListener listener){
+        windowResizedListener.add(listener);
+    }
+    
     private void windowListener() {
         Thread t = new Thread(new Runnable() {
             @Override

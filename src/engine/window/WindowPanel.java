@@ -17,4 +17,9 @@ public abstract class WindowPanel extends JPanel{
         
     }
     
+    public void update(){
+        repaint();
+        window.update();
+    }
+    
 }
