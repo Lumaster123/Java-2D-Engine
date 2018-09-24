@@ -9,6 +9,7 @@ import engine.ThreadHandler;
 import engine.Time;
 import engine.filesystem.FileSystem;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
@@ -16,6 +17,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  *
@@ -94,7 +97,6 @@ public class Window extends JFrame {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle(title);
-        setLayout(null);
         setLocationRelativeTo(null);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         if(iconPath != null && !iconPath.equals("")){
@@ -130,7 +132,9 @@ public class Window extends JFrame {
                         defaultWidth = getContentPane().getWidth();
                         defaultHeight = getContentPane().getHeight();
                         
-                        for(WindowResizedListener l : windowResizedListener){
+                        ArrayList<WindowResizedListener> listenerCopy = (ArrayList<WindowResizedListener>) windowResizedListener.clone();
+                        
+                        for(WindowResizedListener l : listenerCopy){
                             l.windowResized(window);
                         }
                         
@@ -140,6 +144,7 @@ public class Window extends JFrame {
             }
 
         });
+        
         setLayout(null);
 
         setVisible(true);
@@ -168,7 +173,10 @@ public class Window extends JFrame {
     public void addWindowPanel(WindowPanel panel){
         panel.setSize(getContentPane().getWidth(), getContentPane().getHeight());
         setContentPane(panel);
-        
+        if(panel instanceof WindowResizedListener){
+            windowResizedListener.clear();
+            windowResizedListener.add((WindowResizedListener)panel);
+        }            
     }
     
     public int getDefaultWidth() {
