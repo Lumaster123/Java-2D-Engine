@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -13,6 +14,8 @@ import javax.imageio.ImageIO;
 public class FileSystem {
     
     private static FileSystem fs = new FileSystem();
+    
+    private static HashMap<String, BufferedImage> imageFastLoad = new HashMap<>();
     
     public FileSystem(){
         
@@ -23,8 +26,11 @@ public class FileSystem {
     }
     
     public static BufferedImage readInternImage(String name){
+        if(imageFastLoad.containsKey(name))
+            return imageFastLoad.get(name);
         try {
-            return ImageIO.read(getInternInputStream(name));
+            imageFastLoad.put(name, ImageIO.read(getInternInputStream(name)));
+            return imageFastLoad.get(name);
         } catch (IOException | IllegalArgumentException ex) {
             throw new Error('"'+name+'"'+" does not exist!", ex);
         }
