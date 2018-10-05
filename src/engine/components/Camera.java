@@ -48,7 +48,7 @@ public class Camera {
     }
     
     
-    public void focusEntity(Entity entity){
+    public void focusEntity(Entity entity, int leftBorderInPercent, int rightBorderInPercent, int topBorderInPercent, int bottomBorderInPercent){
         
         if(this.entity != null){
             followEntity = false;
@@ -69,10 +69,15 @@ public class Camera {
                         break;
                     }
                     
-                    float rs = window.getDefaultWidth()*0.6f;
-                    float ls = window.getDefaultWidth()*0.2f;
-                    float us = window.getDefaultHeight()*0.2f;
-                    float ds = window.getDefaultHeight()*0.8f;
+//                    float rs = window.getDefaultWidth()*0.6f;
+//                    float ls = window.getDefaultWidth()*0.2f;
+//                    float us = window.getDefaultHeight()*0.2f;
+//                    float ds = window.getDefaultHeight()*0.8f;
+                    
+                    float rs = window.getDefaultWidth()*rightBorderInPercent/100;
+                    float ls = window.getDefaultWidth()*leftBorderInPercent/100;
+                    float us = window.getDefaultHeight()*topBorderInPercent/100;
+                    float ds = window.getDefaultHeight()*bottomBorderInPercent/100;
                     
                     float x = 0, y = 0;
                     
