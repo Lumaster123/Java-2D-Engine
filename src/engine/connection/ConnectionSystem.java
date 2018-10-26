@@ -4,6 +4,7 @@ import engine.console.ConsoleManager;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +24,7 @@ public class ConnectionSystem {
     
     private int server_port;
     private InetAddress server_address;
+    private int timeout;
     
     private ConnectionState state;
     
@@ -39,7 +41,7 @@ public class ConnectionSystem {
         }
     }
     
-    public void initializeClient(String inetAddress, int port){
+    public void initializeClient(String inetAddress, int port, int timeout_ms){
         if(state == ConnectionState.CONNECTION_REFUSED || state == ConnectionState.FATAL_ERROR || state == ConnectionState.TIME_OUT){
             ConsoleManager.writeOnConsole(prefix, "The Connection is damaged! You have to resolve the problem frist!");
         }else if(state == ConnectionState.CONNECTED || state == ConnectionState.CONNECTING){
@@ -48,10 +50,30 @@ public class ConnectionSystem {
             try {
                 server_address = InetAddress.getByName(inetAddress);
                 server_port = port;
+                timeout = timeout_ms;
             } catch (UnknownHostException ex) {
                 Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    public boolean connect(int attempts){
+        
+        for(int i = 0; i < attempts; i++){
+            
+            startConnection();
+            if(state == ConnectionState.CONNECTED){
+                return true;
+            }else if(state == ConnectionState.CONNECTION_REFUSED || state == ConnectionState.FATAL_ERROR || state == ConnectionState.TIME_OUT){
+                resolveProblem();
+            }else{
+                stopConnection();
+            }
+            
+        }
+        state = ConnectionState.TIME_OUT;
+        ConsoleManager.writeOnConsole(prefix, "Could not connect in "+attempts+" attempts!");
+        return false;
     }
     
     public void startConnection(){
@@ -61,10 +83,12 @@ public class ConnectionSystem {
             ConsoleManager.writeOnConsole(prefix, "The Connection is active! You have to stop the connection first!");
         }else if(state == ConnectionState.NOT_CONNECTED){
             try {
-                client = new Socket(server_address, server_port);
                 state = ConnectionState.CONNECTING;
+                client = new Socket(server_address, server_port);
+                state = ConnectionState.CONNECTED;
             } catch (IOException ex) {
-                ConsoleManager.writeOnConsole(prefix, "The Connection could not be created! Cannot open a connection without a server at the server_addres and server_port!");
+                state = ConnectionState.FATAL_ERROR;
+                ConsoleManager.writeOnConsole(prefix, "The Connection could not be created! Cannot open a connection without a server at the server_address and server_port!");
             }
         }
     }
@@ -89,8 +113,10 @@ public class ConnectionSystem {
     public void resolveProblem(){
         if(state == ConnectionState.CONNECTION_REFUSED || state == ConnectionState.FATAL_ERROR || state == ConnectionState.TIME_OUT){
             try {
-                client.close();
-                client = null;
+                if(client != null){
+                    client.close();
+                    client = null;
+                }
             } catch (IOException ex) {
                 Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -101,6 +127,11 @@ public class ConnectionSystem {
         }
         ConsoleManager.writeOnConsole(prefix, "The ConnectionState is not an error and cannot be resolved!");
     }
+
+    public ConnectionState getState() {
+        return state;
+    }
+    
     
     
 }
