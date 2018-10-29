@@ -1,11 +1,15 @@
 package engine.connection;
 
+import engine.ThreadHandler;
+import engine.Time;
 import engine.console.ConsoleManager;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,13 +28,19 @@ public class ConnectionSystem {
     
     private int server_port;
     private InetAddress server_address;
-    private int timeout;
     
     private ConnectionState state;
     
     private Socket client;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
+    
+    private ArrayList<Packet> receivedPacketList;
+    private ArrayList<Packet> sendingPacketList;
     
     public ConnectionSystem(){
+        receivedPacketList = new ArrayList<>();
+        sendingPacketList = new ArrayList<>();
         try {
             state = ConnectionState.NOT_CONNECTED;
             server_port = 38475;
@@ -39,9 +49,10 @@ public class ConnectionSystem {
         } catch (UnknownHostException ex) {
             Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
         }
+        startStreamCycle();
     }
     
-    public void initializeClient(String inetAddress, int port, int timeout_ms){
+    public void initializeClient(String inetAddress, int port){
         if(state == ConnectionState.CONNECTION_REFUSED || state == ConnectionState.FATAL_ERROR || state == ConnectionState.TIME_OUT){
             ConsoleManager.writeOnConsole(prefix, "The Connection is damaged! You have to resolve the problem frist!");
         }else if(state == ConnectionState.CONNECTED || state == ConnectionState.CONNECTING){
@@ -50,7 +61,6 @@ public class ConnectionSystem {
             try {
                 server_address = InetAddress.getByName(inetAddress);
                 server_port = port;
-                timeout = timeout_ms;
             } catch (UnknownHostException ex) {
                 Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -63,6 +73,12 @@ public class ConnectionSystem {
             
             startConnection();
             if(state == ConnectionState.CONNECTED){
+                try {
+                    inputStream = new ObjectInputStream(client.getInputStream());
+                    outputStream = new ObjectOutputStream(client.getOutputStream());
+                } catch (IOException ex) {
+                    Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 return true;
             }else if(state == ConnectionState.CONNECTION_REFUSED || state == ConnectionState.FATAL_ERROR || state == ConnectionState.TIME_OUT){
                 resolveProblem();
@@ -132,6 +148,90 @@ public class ConnectionSystem {
         return state;
     }
     
+    public boolean sendPacket(Packet packet){
+        if(packet == null){
+            Exception ex = new Exception("[ConnectionSystem] Cannot accept a NULL-Packet!");
+            ex.printStackTrace();
+            return false;
+        }
+        packet.preparePacket(client.getLocalAddress(), client.getInetAddress());
+        if(packet.isPacketReady()){
+            sendingPacketList.add(packet);
+            return true;
+        }else{
+            ConsoleManager.writeOnConsole(prefix, "An error occurred while preparing the Packet!");
+            return false;
+        }
+    }
     
+    public Packet receivePacket(){
+        if(receivedPacketList.isEmpty()){
+            while(receivedPacketList.isEmpty()){Time.sleep(0.1);}
+        }
+        Packet retPacket = receivedPacketList.get(0);
+        receivedPacketList.remove(0);
+        return retPacket;
+    }
+    
+    private void startStreamCycle(){
+        ThreadHandler.invoke("ConnectionSystemReadStreamThread", new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    if(state == ConnectionState.CONNECTED && client != null){
+                        readInputStream();
+                    }
+                    Time.sleep(0.1);
+                }
+            }
+        });
+        ThreadHandler.invoke("ConnectionSystemWriteStreamThread", new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    if(state == ConnectionState.CONNECTED && client != null){
+                        if(sendingPacketList.size() > 0){
+                            writeOutputStream();
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    private void readInputStream(){
+        if(inputStream == null)
+            return;
+        
+        try {
+            Object input = inputStream.readObject();
+            if(input instanceof Packet){
+                receivedPacketList.add((Packet)input);
+                System.out.println("received an Packet");
+            }else{
+                ConsoleManager.writeOnConsole(prefix, "Received an object, which is not a Packet!");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    private void writeOutputStream(){
+        if(outputStream == null)
+            return;
+        
+        Object obj = sendingPacketList.get(0);
+        try {
+            outputStream.writeObject(obj);
+            System.out.println("sent the packet");
+            sendingPacketList.remove(0);
+        } catch (IOException ex) {
+            Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     
 }
