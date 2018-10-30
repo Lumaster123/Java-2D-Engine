@@ -12,12 +12,7 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/rendering/RenderableObject.java</file>
-            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/components/Camera.java</file>
-            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/filesystem/ImageHandler.java</file>
-            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/components/entity/Entity.java</file>
             <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/connection/Packet.java</file>
-            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/filesystem/FileSystem.java</file>
             <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/connection/ConnectionSystem.java</file>
         </group>
     </open-files>

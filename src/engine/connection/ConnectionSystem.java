@@ -3,6 +3,7 @@ package engine.connection;
 import engine.ThreadHandler;
 import engine.Time;
 import engine.console.ConsoleManager;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -74,8 +75,8 @@ public class ConnectionSystem {
             startConnection();
             if(state == ConnectionState.CONNECTED){
                 try {
-                    inputStream = new ObjectInputStream(client.getInputStream());
                     outputStream = new ObjectOutputStream(client.getOutputStream());
+                    inputStream = new ObjectInputStream(client.getInputStream());
                 } catch (IOException ex) {
                     Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -188,12 +189,19 @@ public class ConnectionSystem {
         ThreadHandler.invoke("ConnectionSystemWriteStreamThread", new Runnable() {
             @Override
             public void run() {
+                int countBefore = 0;
                 while(true){
+                    if(countBefore != sendingPacketList.size()){
+                        System.out.println(sendingPacketList.size());
+                    }
+                    countBefore = sendingPacketList.size();
                     if(state == ConnectionState.CONNECTED && client != null){
+                        
                         if(sendingPacketList.size() > 0){
                             writeOutputStream();
                         }
                     }
+                    Time.sleep(0.1);
                 }
             }
         });
@@ -225,6 +233,7 @@ public class ConnectionSystem {
         
         Object obj = sendingPacketList.get(0);
         try {
+            System.out.println("trying to send the packet");
             outputStream.writeObject(obj);
             System.out.println("sent the packet");
             sendingPacketList.remove(0);

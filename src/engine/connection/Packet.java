@@ -34,19 +34,12 @@ public class Packet implements Cloneable, Serializable{
     
     public void preparePacket(InetAddress source, InetAddress target){
         if(source != null && target != null){
-            if(routingTable.size() >= 2 && routingTable.get(routingTable.size()-2).equals(source) && routingTable.get(routingTable.size()-1).equals(target)){
-                Exception ex = new Exception("[ConnectionSystem - Packet] This packet was already sent! A packet can only be sent once to the same target!");
-                ex.printStackTrace();
-            }else{
-                if(routingTable.size() >= 2 && routingTable.get(routingTable.size()-1).equals(source)){
-                    routingTable.add(target);
-                }else{
-                    routingTable.add(source);
-                    routingTable.add(target);
-                }
-                this.source = source;
-                this.target = target;
-            }
+            routingTable.add(source);
+            routingTable.add(target);
+            
+            this.source = source;
+            this.target = target;
+            
         }else{
             Exception ex = new Exception("[ConnectionSystem - Packet] Source and/or target can't be NULL!");
             ex.printStackTrace();
@@ -54,11 +47,10 @@ public class Packet implements Cloneable, Serializable{
     }
     
     public boolean isPacketReady(){
-        if(routingTable.size() >= 2 && routingTable.get(routingTable.size()-2).equals(source) && routingTable.get(routingTable.size()-1).equals(target)){
-            System.err.println("[ConnectionSystem - Packet] This packet was already sent! A packet can only be sent once to the same target!");
-            return false;
+        if(source != null && target != null){
+            return true;
         }
-        return true;
+        return false;
     }
     
     private void prepareCommand(String command){
