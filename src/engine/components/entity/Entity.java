@@ -6,6 +6,7 @@ import engine.physic.PhysicSystem;
 import engine.physic.Physic_CollisionListener;
 import engine.physic.Physic_MoveListener;
 import engine.rendering.Renderer;
+import java.awt.Point;
 
 public abstract class Entity extends engine.rendering.RenderableObject implements Physic_CollisionListener{
     
@@ -114,6 +115,10 @@ public abstract class Entity extends engine.rendering.RenderableObject implement
         
     }
 
+    public Point getCenter(){
+        return new Point((int)(x+width/2), (int)(y+height/2));
+    }
+    
     public void setPhysicHeight(float physicHeight) {
         this.physicHeight = physicHeight;
     }

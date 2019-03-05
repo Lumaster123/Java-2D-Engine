@@ -153,7 +153,6 @@ public class Window extends JFrame {
 
 //        defaultWidth = getContentPane().getWidth();
 //        defaultHeight = getContentPane().getHeight();
-        System.out.println(defaultHeight);
     }
 
     public void update(){
@@ -177,6 +176,14 @@ public class Window extends JFrame {
             windowResizedListener.clear();
             windowResizedListener.add((WindowResizedListener)panel);
         }            
+    }
+    
+    public int getCurrentWidth(){
+        return getContentPane().getWidth();
+    }
+    
+    public int getCurrentHeight(){
+        return getContentPane().getHeight();
     }
     
     public int getDefaultWidth() {

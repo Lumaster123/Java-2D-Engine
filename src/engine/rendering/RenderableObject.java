@@ -1,6 +1,7 @@
 package engine.rendering;
 
 import engine.rendering.Renderer.Layer;
+import java.awt.Point;
 
 public abstract class RenderableObject implements Renderable{
     
@@ -8,6 +9,7 @@ public abstract class RenderableObject implements Renderable{
     
     protected float x, y;
     protected float width, height;
+    protected float rotation;
 
     public RenderableObject(Layer layer, float x, float y, float width, float height) {
         this.layer = layer;
@@ -17,23 +19,9 @@ public abstract class RenderableObject implements Renderable{
         this.height = height;
     }
 
-//    public float getX() {
-//        return x;
-//    }
-//
-//    public float getY() {
-//        return y;
-//    }
-//
-//    public float getWidth() {
-//        return width;
-//    }
-//
-//    public float getHeight() {
-//        return height;
-//    }
-    
-    
+    public boolean isInObject(Point point){
+        return point.x >= x && point.x <= x+width && point.y >= y && point.y <= y+height;
+    }
     
     public Layer getLayer(){
         return layer;

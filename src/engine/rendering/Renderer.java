@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 
@@ -35,6 +36,9 @@ public class Renderer extends JPanel{
     private long timeStart = 0;
     private long timeEnd = 0;
     
+    private boolean isRepainting;
+    private double prevSleepTime;
+    
     public Renderer(Window window) {
         
         this.window = window;
@@ -46,11 +50,12 @@ public class Renderer extends JPanel{
         
         list = new ArrayList<>();
         
-        ThreadHandler.invoke(new Runnable() {
+        ThreadHandler.invoke("Renderer", new Runnable() {
             @Override
             public void run() {
                 
                 while (true) {
+                    
                     if (reset) {
                         counter = 0;
                         reset = false;
@@ -59,24 +64,17 @@ public class Renderer extends JPanel{
                     
                     list = (ArrayList<RenderableObject>) renderList.clone();
                     switchCamera = false;
+                    isRepainting = true;
                     repaint();
+                    while(isRepainting){Time.sleep(0.00001);}
                     switchCamera = true;
                     
                     
-                    timeEnd = System.nanoTime();
                     if(Config.FPS_CURRENT_SETTING > 0){
-                        double sleep = 1000 / Config.FPS_CURRENT_SETTING;
-                        
-                        long usedTime = (timeEnd - timeStart) / 1000000;
-                        
-                        if(usedTime >= sleep){
-                            
-                        }else{
-                            Time.sleep(sleep-usedTime);
-                        }
+                        long prevStart = timeStart;
+                        timeStart = System.nanoTime();
+                        prevSleepTime = Time.sleep(1000 / Config.FPS_CURRENT_SETTING + prevSleepTime - (((double)(System.nanoTime() - prevStart)) / 1000000));
                     }
-                    timeStart = System.nanoTime();
-                    
                     
                     counter++;
                     if (System.nanoTime() - second > start) {
@@ -98,15 +96,19 @@ public class Renderer extends JPanel{
         
         ArrayList<Overlay> overlays = new ArrayList<Overlay>();        
 
+        
+        
         for (Layer l : Layer.values()) {
             
             for (RenderableObject ob : list) {
                 if (ob.getLayer() == l) {
+                    AffineTransform transform = gdraw.getTransform();
                     if(ob instanceof Overlay){
                         overlays.add((Overlay) ob);
                     }else{
                         ob.draw(gdraw, ob.x-camera.x, ob.y-camera.y);
                     }
+                    gdraw.setTransform(transform);
                 }
             }
             
@@ -138,7 +140,7 @@ public class Renderer extends JPanel{
         }
         
 //        screen = ImageHandler.scaleImage(screen, 1920, 1080);
-        
+        isRepainting = false;
     }
 
     public static void setCamera(Camera camera){

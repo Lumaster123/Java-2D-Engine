@@ -44,6 +44,9 @@ public class Keyboard extends Component implements KeyListener{
         for(KeyChangedListener l : listener){
             l.keyChanged(e.getKeyCode(), false);
         }
+        for(KeyChangedListener l : listener){
+            l.keyTyped(e);
+        }
     }
 
     public ArrayList<Integer> getPressedKeys() {

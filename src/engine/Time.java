@@ -7,14 +7,15 @@ public abstract class Time {
     
     public static double timeSlept = 0;
     
-    public static void sleep(double ms){
-        boolean end = false;
+    public static double sleep(double ms){
+        if(ms < 0)
+            return 0;
         long timestamp = System.nanoTime();
         long nano = (long)(ms * 1000000+timestamp);
-        while(!end){
+        while(true){
             if(System.nanoTime() > nano){
                 timeSlept+=ms;
-                return;
+                return ms;
             }
             try {
                 Thread.sleep(0, 1);
