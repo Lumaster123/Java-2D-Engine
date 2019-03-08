@@ -30,21 +30,29 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
         
         text = "";
         textItem = new TextItem(layer, x, y);
-        textItem.setFont(new Font("Times new Roman", 1, 24));
+        textItem.setOrientation(0, 1);
+        font = textItem.getFont();
         
         hasFocus = false;
     }
 
     @Override
     public void draw(Graphics2D g, float x, float y) {
-        if(text == "" && hasFocus)
+        textItem.setColor(color);
+        textItem.setFont(font);
+        if(text.isEmpty() && !hasFocus){
+            textItem.setColor(Color.gray);
+            textItem.setText(background_text);
+        }else{
             textItem.setText(text);
+        }
+        
         g.setColor(Color.LIGHT_GRAY);
         g.fill3DRect((int)x, (int)y, (int)width, (int)height, true);
         g.setColor(Color.white);
         g.fill3DRect((int)x+2, (int)y+2, (int)width-4, (int)height-4, true);
-        textItem.draw(g, x +2, y+2);
         
+        textItem.draw(g, x + 5, y + height/2);
     }
 
     @Override
@@ -66,6 +74,16 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
     @Override
     public void mouseMoved(Point prevPosition, Point position) {
         
+    }
+    
+    @Override
+    public void mouseHover(RenderableObject target, Point prevPosition, Point position) {
+        
+    }
+    
+    @Override
+    public boolean isTargetableFromMouse() {
+        return true;
     }
 
     @Override
@@ -89,7 +107,22 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
                 text += c;
         }
     }
-    
+
+    public void setFont(Font font) {
+        this.font = font;
+    }
+
+    public Font getFont() {
+        return font;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public Color getColor() {
+        return color;
+    }
     
     public void setBackground_text(String background_text) {
         this.background_text = background_text;
@@ -122,6 +155,8 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
     public void setWidth(float width) {
         this.width = width;
     }
+
+
 
     
     

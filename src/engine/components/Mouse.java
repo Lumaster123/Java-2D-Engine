@@ -1,5 +1,6 @@
 package engine.components;
 
+import engine.rendering.Renderable;
 import engine.rendering.RenderableObject;
 import engine.rendering.Renderer;
 import java.awt.Point;
@@ -24,15 +25,7 @@ public class Mouse extends Component implements java.awt.event.MouseListener, Mo
     
     @Override
     public void mouseClicked(MouseEvent e) {
-        ArrayList<RenderableObject> list = Renderer.getRenderList();
-        for(int i = list.size()-1; i >= 0; i--){
-            if(list.get(i).isInObject(e.getPoint())){
-                for (MouseListener l : listener) {
-                    l.clicked(list.get(i), e.getPoint(), e.getButton());
-                }
-                return;
-            }
-        }
+        
     }
 
     @Override
@@ -53,13 +46,37 @@ public class Mouse extends Component implements java.awt.event.MouseListener, Mo
         for (MouseListener l : listener) {
             l.buttonChanged(e.getButton(), false);
         }
-        mouseClicked(e);
+        ArrayList<Renderable> list = (ArrayList<Renderable>) Renderer.getRenderSequenz().clone();
+        for(int i = list.size()-1; i >= 0; i--){
+            if(list.get(i) instanceof RenderableObject && ((RenderableObject)list.get(i)).isInObject(e.getPoint()) && ((RenderableObject)list.get(i)).isTargetableFromMouse()){
+                for (MouseListener l : listener) {
+                    l.clicked(((RenderableObject)list.get(i)), e.getPoint(), e.getButton());
+                }
+                return;
+            }
+        }
+        for (MouseListener l : listener) {
+            l.clicked(null, e.getPoint(), e.getButton());
+        }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         for (MouseListener l : listener) {
             l.mouseMoved(previousePoint, e.getPoint());
+        }
+        ArrayList<Renderable> list = (ArrayList<Renderable>) Renderer.getRenderSequenz().clone();
+        for(int i = list.size()-1; i >= 0; i--){
+            if(list.get(i) instanceof RenderableObject && ((RenderableObject)list.get(i)).isInObject(e.getPoint()) && ((RenderableObject)list.get(i)).isTargetableFromMouse()){
+                for (MouseListener l : listener) {
+                    l.mouseHover(((RenderableObject)list.get(i)), previousePoint, e.getPoint());
+                }
+                previousePoint = e.getPoint();
+                return;
+            }
+        }
+        for (MouseListener l : listener) {
+            l.mouseHover(null, previousePoint, e.getPoint());
         }
         previousePoint = e.getPoint();
     }

@@ -10,15 +10,17 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public class Renderer extends JPanel{
 
-    public static ArrayList<RenderableObject> renderList = new ArrayList<>();
+    public static ArrayList<Renderable> renderList = new ArrayList<>();
+    public static ArrayList<Renderable> renderSequenz = new ArrayList<>();
 
-    private ArrayList<RenderableObject> list;
+    private ArrayList<Renderable> list;
     
     private Window window;
     
@@ -62,7 +64,7 @@ public class Renderer extends JPanel{
                         start = System.nanoTime();
                     }
                     
-                    list = (ArrayList<RenderableObject>) renderList.clone();
+                    list = (ArrayList<Renderable>) renderList.clone();
                     switchCamera = false;
                     isRepainting = true;
                     repaint();
@@ -91,23 +93,67 @@ public class Renderer extends JPanel{
         super.paintComponent(gr);
         Graphics2D gdraw = (Graphics2D) gr;
         
-//        screen = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+//        screen = new BufferedImage(1920, 1080, BufferedImagEppan, Bozene.TYPE_INT_ARGB);
 //        Graphics2D g = (Graphics2D) screen.getGraphics();
         
-        ArrayList<Overlay> overlays = new ArrayList<Overlay>();        
+        ArrayList<Overlay> overlays = new ArrayList<>();        
 
+        gdraw.setRenderingHint(RenderingHints.KEY_RENDERING,
+                               RenderingHints.VALUE_RENDER_QUALITY);
+        gdraw.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                               RenderingHints.VALUE_ANTIALIAS_OFF);
+        gdraw.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                               RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        gdraw.setRenderingHint(RenderingHints.KEY_DITHERING,
+                               RenderingHints.VALUE_DITHER_ENABLE);
+        gdraw.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
+                               RenderingHints.VALUE_COLOR_RENDER_DEFAULT);
+        gdraw.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                               RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        gdraw.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,
+                               RenderingHints.VALUE_STROKE_NORMALIZE);
         
-        
+        int index = 0;
         for (Layer l : Layer.values()) {
             
-            for (RenderableObject ob : list) {
+            for (Renderable ob : list) {
                 if (ob.getLayer() == l) {
                     AffineTransform transform = gdraw.getTransform();
                     if(ob instanceof Overlay){
                         overlays.add((Overlay) ob);
                     }else{
-                        ob.draw(gdraw, ob.x-camera.x, ob.y-camera.y);
+                        float x = ob.getPosition().x;
+                        float y = ob.getPosition().y;
+                        if(ob.getRelativePosition().getX() >= 0){
+                            x = (float)ob.getRelativePosition().getX() * this.getWidth() / 100f;
+                            ob.setX(x);
+                        }
+                        if(ob.getRelativePosition().getY() >= 0){
+                            y = (float)ob.getRelativePosition().getY() * this.getHeight()/ 100f;
+                            ob.setY(y);
+                        }
+                        ob.draw(gdraw, x-camera.x, y-camera.y);
                     }
+                    if(index < renderSequenz.size()){
+                        if(renderSequenz.get(index) != ob)
+                            renderSequenz.set(index, ob);
+                    }else{
+                        renderSequenz.add(ob);
+                    }
+                    index++;
+                    if(ob instanceof SubRenderer){
+                        ArrayList<Renderable> subRendererList = ((SubRenderer)ob).getSubRenderItems();
+                        for (Renderable renderable : subRendererList) {
+                            if(index < renderSequenz.size()){
+                                if(renderSequenz.get(index) != renderable)
+                                    renderSequenz.set(index, renderable);
+                            }else{
+                                renderSequenz.add(renderable);
+                            }
+                            index++;
+                        }
+                    }
+                    
                     gdraw.setTransform(transform);
                 }
             }
@@ -115,11 +161,12 @@ public class Renderer extends JPanel{
             for(Overlay o : overlays){
                 o.draw(gdraw, o.x-camera.x, o.y-camera.y);
             }
-            
             overlays.clear();
         }
         
-        
+        for(index = index; index < renderSequenz.size(); index++){
+            renderSequenz.remove(index);
+        }
         
 //        if(window.windowSize == Window.Window_Size.WINDOWED){
 //            screen = ImageHandler.scaleImage(screen, window.getContentPane().getWidth(), (window.getContentPane().getWidth())/16*9);
@@ -155,8 +202,12 @@ public class Renderer extends JPanel{
         });
     }
     
-    public static ArrayList<RenderableObject> getRenderList() {
+    public static ArrayList<Renderable> getRenderList() {
         return renderList;
+    }
+    
+    public static ArrayList<Renderable> getRenderSequenz() {
+        return renderSequenz;
     }
 
     public enum Layer {

@@ -76,7 +76,7 @@ public class TextItem extends RenderableObject{
         if(displayText == null)
             displayText = "";
         
-        Size size = new Size(g.getFontMetrics(font).stringWidth(displayText), g.getFontMetrics(font).getHeight());
+        Size size = new Size(g.getFontMetrics(font).stringWidth(displayText), g.getFontMetrics(font).getHeight()+2);
         
         switch (h_orientation){
             case 0: break;
@@ -84,8 +84,8 @@ public class TextItem extends RenderableObject{
             case 2: xOffset -= size.width; break;
         }
         switch (v_orientation){
-            case 0: yOffset += size.height; break;
-            case 1: yOffset += size.height/2; break;
+            case 0: yOffset += size.height/2; break;
+            case 1: yOffset += size.height/4; break;
             case 2: break;
         }
         
@@ -93,7 +93,6 @@ public class TextItem extends RenderableObject{
             g.setColor(background_color);
             g.fillRect((int)x + xOffset, (int)y + yOffset - size.height, size.width, size.height);
         }
-        
         if(color == null)
             color = Color.BLACK;
         
@@ -101,6 +100,11 @@ public class TextItem extends RenderableObject{
         g.setColor(color);
         g.drawString(displayText, (int)x + xOffset, (int)y + yOffset);
         
+    }
+
+    @Override
+    public boolean isTargetableFromMouse() {
+        return false;
     }
     
 }
