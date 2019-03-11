@@ -4,7 +4,6 @@ import engine.Initializer;
 import engine.components.KeyChangedListener;
 import engine.components.MouseListener;
 import engine.rendering.Renderer.Layer;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 
@@ -17,6 +16,8 @@ public abstract class RenderableObject implements Renderable{
     protected float width, height;
     protected float rotation;
 
+    protected boolean drawCentered;
+    
     public RenderableObject(Layer layer, float x, float y, float width, float height) {
         this.layer = layer;
         relativeX = -1;
@@ -40,10 +41,10 @@ public abstract class RenderableObject implements Renderable{
     
     public boolean isInObject(Point point){
         float x = this.x, y = this.y;
-        if(relativeX >= 0)
-            x -= width/2;
-        if(relativeY >= 0)
-            y -= height/2;
+//        if(relativeX >= 0)
+//            x -= width/2;
+//        if(relativeY >= 0)
+//            y -= height/2;
         return point.x >= x && point.x <= x+width && point.y >= y && point.y <= y+height;
     }
     
@@ -129,7 +130,17 @@ public abstract class RenderableObject implements Renderable{
     public void setY(float y) {
         this.y = y;
     }
-    
+
+    @Override
+    public float getWidth() {
+        return width;
+    }
+
+    @Override
+    public float getHeight() {
+        return height;
+    }
+
     
     
 }

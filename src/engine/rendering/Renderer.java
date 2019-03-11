@@ -126,10 +126,12 @@ public class Renderer extends JPanel{
                         float y = ob.getPosition().y;
                         if(ob.getRelativePosition().getX() >= 0){
                             x = (float)ob.getRelativePosition().getX() * this.getWidth() / 100f;
+                            x -= ob.getWidth()/2;
                             ob.setX(x);
                         }
                         if(ob.getRelativePosition().getY() >= 0){
                             y = (float)ob.getRelativePosition().getY() * this.getHeight()/ 100f;
+                            y -= ob.getHeight()/2;
                             ob.setY(y);
                         }
                         ob.draw(gdraw, x-camera.x, y-camera.y);

@@ -12,6 +12,8 @@ public interface Renderable {
     public Renderer.Layer getLayer();
     public void setX(float x);
     public void setY(float y);
+    public float getWidth();
+    public float getHeight();
     
     public boolean isTargetableFromMouse();
     

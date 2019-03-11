@@ -1,6 +1,5 @@
 package engine.rendering.item;
 
-import engine.Initializer;
 import engine.components.KeyChangedListener;
 import engine.components.MouseListener;
 import engine.rendering.RenderableObject;
@@ -25,9 +24,6 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
     public TextInputItem(Renderer.Layer layer, float x, float y, float width, float height) {
         super(layer, x, y, width, height);
         
-        Initializer.addKeyboardListener(this);
-        Initializer.addMouseListener(this);
-        
         text = "";
         textItem = new TextItem(layer, x, y);
         textItem.setOrientation(0, 1);
@@ -44,7 +40,16 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
             textItem.setColor(Color.gray);
             textItem.setText(background_text);
         }else{
-            textItem.setText(text);
+            if(!hasFocus){
+                textItem.setText(text);
+            }else{
+                long n = (System.nanoTime() / 1000000) % 1000;
+                if(n >= 0 && n < 500){
+                    textItem.setText(text+"|");
+                }else{
+                    textItem.setText(text);
+                }
+            }
         }
         
         g.setColor(Color.LIGHT_GRAY);

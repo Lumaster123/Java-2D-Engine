@@ -1,6 +1,5 @@
 package engine.rendering.item;
 
-import engine.Initializer;
 import engine.ThreadHandler;
 import engine.components.MouseListener;
 import engine.rendering.RenderableObject;
@@ -17,8 +16,6 @@ public class PushButton extends RenderableObject implements MouseListener{
     
     public PushButton(Renderer.Layer layer, float x, float y, float width, float height, String text) {
         super(layer, x, y, width, height);
-        
-        Initializer.addMouseListener(this);
         
         this.text = new TextItem(layer, x, y);
         this.text.setOrientation(1, 1);
@@ -39,8 +36,6 @@ public class PushButton extends RenderableObject implements MouseListener{
     
     @Override
     public void draw(Graphics2D g, float x, float y) {
-        x -= width/2;
-        y -= height/2;
         g.setColor(Color.lightGray);
         g.fillRect((int)x, (int)y, (int)width, (int)height);
         g.setColor(Color.white);
