@@ -3,7 +3,6 @@ package engine.connection;
 import engine.ThreadHandler;
 import engine.Time;
 import engine.console.ConsoleManager;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -72,6 +71,10 @@ public class ConnectionSystem {
         
         for(int i = 0; i < attempts; i++){
             
+            if(state == ConnectionState.CONNECTED){
+                ConsoleManager.writeOnConsole(prefix, "The Connection is active! You have to stop the connection first!");
+                return false;
+            }
             startConnection();
             if(state == ConnectionState.CONNECTED){
                 try {
@@ -222,7 +225,7 @@ public class ConnectionSystem {
         } catch (IOException ex) {
             Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
+            ConsoleManager.writeOnConsole(prefix, "Received an object, which is not a Packet!");
         }
         
     }

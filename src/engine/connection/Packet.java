@@ -107,6 +107,14 @@ public class Packet implements Cloneable, Serializable{
         return command;
     }
     
+    public String getWholeCommand(){
+        String ret = "";
+        for (String string : command) {
+            ret += string + " ";
+        }
+        return ret.substring(0, ret.length()-1);
+    }
+    
     public Packet clone(){
         try {
             Packet packet = (Packet) super.clone();
