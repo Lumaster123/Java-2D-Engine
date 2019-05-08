@@ -12,9 +12,10 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/connection/Packet.java</file>
+            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/rendering/item/ComboBoxItem.java</file>
             <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/connection/ConnectionSystem.java</file>
             <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/rendering/item/CheckBoxItem.java</file>
+            <file>file:/C:/Users/MLZBook/Documents/GitHub/Java-2D-Engine/src/engine/rendering/Renderer.java</file>
         </group>
     </open-files>
 </project-private>

@@ -11,6 +11,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -119,6 +120,7 @@ public class Renderer extends JPanel{
             for (Renderable ob : list) {
                 if (ob.getLayer() == l) {
                     AffineTransform transform = gdraw.getTransform();
+                    Stroke stroke = gdraw.getStroke();
                     if(ob instanceof Overlay){
                         overlays.add((Overlay) ob);
                     }else{
@@ -157,6 +159,7 @@ public class Renderer extends JPanel{
                     }
                     
                     gdraw.setTransform(transform);
+                    gdraw.setStroke(stroke);
                 }
             }
             

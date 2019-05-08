@@ -117,13 +117,8 @@ public class ConnectionSystem {
         if(state == ConnectionState.CONNECTION_REFUSED || state == ConnectionState.FATAL_ERROR || state == ConnectionState.TIME_OUT){
             ConsoleManager.writeOnConsole(prefix, "The Connection is damaged! Cannot close a connection thas is damaged!");
         }else if(state == ConnectionState.CONNECTED || state == ConnectionState.CONNECTING){
-            try {
-                client.close();
-                client = null;
-                state = ConnectionState.NOT_CONNECTED;
-            } catch (IOException ex) {
-                Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            destroyClient();
+            state = ConnectionState.NOT_CONNECTED;
         }else if(state == ConnectionState.NOT_CONNECTED){
             ConsoleManager.writeOnConsole(prefix, "The Connection is not active! Cannot close a connection thas is already closed!");
         }
@@ -132,13 +127,8 @@ public class ConnectionSystem {
     
     public void resolveProblem(){
         if(state == ConnectionState.CONNECTION_REFUSED || state == ConnectionState.FATAL_ERROR || state == ConnectionState.TIME_OUT){
-            try {
-                if(client != null){
-                    client.close();
-                    client = null;
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ConnectionSystem.class.getName()).log(Level.SEVERE, null, ex);
+            if(client != null){
+                destroyClient();
             }
             
             state = ConnectionState.NOT_CONNECTED;
@@ -148,6 +138,33 @@ public class ConnectionSystem {
         ConsoleManager.writeOnConsole(prefix, "The ConnectionState is not an error and cannot be resolved!");
     }
 
+    public void destroyClient(){
+        if(outputStream != null){
+            try {
+                outputStream.close();
+            } catch (IOException ex) {
+                System.out.println("ERROR: An error occurred while closing the OutputStream of "+toString());
+            }
+            outputStream = null;
+        }
+        if(inputStream != null){
+            try {
+                inputStream.close();
+            } catch (IOException ex) {
+                System.out.println("ERROR: An error occurred while closing the InputStream of "+toString());
+            }
+            inputStream = null;
+        }
+        if(client != null){
+            try {
+                client.close();
+            } catch (IOException ex) {
+                System.out.println("ERROR: An error occurred while closing the socket of "+toString());
+            }
+            client = null;
+        }
+    }
+    
     public ConnectionState getState() {
         return state;
     }
