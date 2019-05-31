@@ -87,6 +87,10 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
     }
     
     @Override
+    public void mouseWheelMoved(int amount) {
+    }
+    
+    @Override
     public boolean isTargetableFromMouse() {
         return true;
     }
@@ -160,6 +164,8 @@ public class TextInputItem extends RenderableObject implements MouseListener, Ke
     public void setWidth(float width) {
         this.width = width;
     }
+
+    
 
 
 

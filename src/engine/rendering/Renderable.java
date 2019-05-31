@@ -14,6 +14,7 @@ public interface Renderable {
     public void setY(float y);
     public float getWidth();
     public float getHeight();
+    public boolean isVisible();
     
     public boolean isTargetableFromMouse();
     

@@ -11,5 +11,6 @@ public interface MouseListener {
     public void mouseMoved(Point prevPosition, Point position);
     public void mouseHover(RenderableObject target, Point prevPosition, Point position);
     
+    public void mouseWheelMoved(int amount);
     
 }

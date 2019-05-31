@@ -69,6 +69,10 @@ public class PushButton extends RenderableObject implements MouseListener{
     }
 
     @Override
+    public void mouseWheelMoved(int amount) {
+    }
+    
+    @Override
     public boolean isTargetableFromMouse() {
         return true;
     }

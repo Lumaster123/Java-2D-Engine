@@ -6,9 +6,11 @@ import engine.rendering.Renderer;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 
-public class Mouse extends Component implements java.awt.event.MouseListener, MouseMotionListener{
+public class Mouse extends Component implements java.awt.event.MouseListener, MouseMotionListener, MouseWheelListener{
 
     private Point previousePoint;
     private ArrayList<Integer> pressedKeys;
@@ -17,6 +19,8 @@ public class Mouse extends Component implements java.awt.event.MouseListener, Mo
     public Mouse(){
         pressedKeys = new ArrayList<>();
         listener = new ArrayList<>();
+        
+        previousePoint = new Point(0, 0);
     }
     
     public void addListener(MouseListener listener){
@@ -48,7 +52,7 @@ public class Mouse extends Component implements java.awt.event.MouseListener, Mo
         }
         ArrayList<Renderable> list = (ArrayList<Renderable>) Renderer.getRenderSequenz().clone();
         for(int i = list.size()-1; i >= 0; i--){
-            if(list.get(i) instanceof RenderableObject && ((RenderableObject)list.get(i)).isInObject(e.getPoint()) && ((RenderableObject)list.get(i)).isTargetableFromMouse()){
+            if(list.get(i) instanceof RenderableObject && ((RenderableObject)list.get(i)).isInObject(e.getPoint()) && ((RenderableObject)list.get(i)).isTargetableFromMouse() && ((RenderableObject)list.get(i)).isVisible()){
                 for (MouseListener l : listener) {
                     l.clicked(((RenderableObject)list.get(i)), e.getPoint(), e.getButton());
                 }
@@ -67,7 +71,29 @@ public class Mouse extends Component implements java.awt.event.MouseListener, Mo
         }
         ArrayList<Renderable> list = (ArrayList<Renderable>) Renderer.getRenderSequenz().clone();
         for(int i = list.size()-1; i >= 0; i--){
-            if(list.get(i) instanceof RenderableObject && ((RenderableObject)list.get(i)).isInObject(e.getPoint()) && ((RenderableObject)list.get(i)).isTargetableFromMouse()){
+            if(list.get(i) instanceof RenderableObject && ((RenderableObject)list.get(i)).isInObject(e.getPoint()) && ((RenderableObject)list.get(i)).isTargetableFromMouse() && ((RenderableObject)list.get(i)).isVisible()){
+                for (MouseListener l : listener) {
+                    l.mouseHover(((RenderableObject)list.get(i)), previousePoint, e.getPoint());
+                }
+                previousePoint = e.getPoint();
+                return;
+            }
+        }
+        for (MouseListener l : listener) {
+            l.mouseHover(null, previousePoint, e.getPoint());
+        }
+        previousePoint = e.getPoint();
+    }
+
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        for (MouseListener l : listener) {
+            l.mouseMoved(previousePoint, e.getPoint());
+        }
+        ArrayList<Renderable> list = (ArrayList<Renderable>) Renderer.getRenderSequenz().clone();
+        for(int i = list.size()-1; i >= 0; i--){
+            if(list.get(i) instanceof RenderableObject && ((RenderableObject)list.get(i)).isInObject(e.getPoint()) && ((RenderableObject)list.get(i)).isTargetableFromMouse() && ((RenderableObject)list.get(i)).isVisible()){
                 for (MouseListener l : listener) {
                     l.mouseHover(((RenderableObject)list.get(i)), previousePoint, e.getPoint());
                 }
@@ -82,14 +108,6 @@ public class Mouse extends Component implements java.awt.event.MouseListener, Mo
     }
     
     @Override
-    public void mouseDragged(MouseEvent e) {
-        for (MouseListener l : listener) {
-            l.mouseMoved(previousePoint, e.getPoint());
-        }
-        previousePoint = e.getPoint();
-    }
-    
-    @Override
     public void mouseEntered(MouseEvent e) {
         
     }
@@ -98,6 +116,15 @@ public class Mouse extends Component implements java.awt.event.MouseListener, Mo
     public void mouseExited(MouseEvent e) {
         
     }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        for (MouseListener l : listener) {
+            l.mouseWheelMoved(e.getWheelRotation());
+        }
+    }
+
+    
 
     
     

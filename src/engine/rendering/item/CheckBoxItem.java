@@ -7,6 +7,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 
 public class CheckBoxItem extends RenderableObject implements MouseListener{
@@ -26,11 +27,14 @@ public class CheckBoxItem extends RenderableObject implements MouseListener{
         
         if(isChecked()){
             Stroke oldStroke = g.getStroke();
+            Object oldAntialiasing = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setStroke(new BasicStroke(7, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g.setColor(Color.red);
             g.drawLine((int)x+9, (int)y+9, (int)x+(int)width-9, (int)y+(int)height-9);
             g.drawLine((int)x+9, (int)y+(int)height-9, (int)x+(int)width-9, (int)y+9);
             g.setStroke(oldStroke);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAntialiasing);
         }
     }
     
@@ -71,4 +75,8 @@ public class CheckBoxItem extends RenderableObject implements MouseListener{
     public void mouseHover(RenderableObject target, Point prevPosition, Point position) {
     }
 
+    @Override
+    public void mouseWheelMoved(int amount) {
+    }
+    
 }

@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -118,7 +119,7 @@ public class Renderer extends JPanel{
         for (Layer l : Layer.values()) {
             
             for (Renderable ob : list) {
-                if (ob.getLayer() == l) {
+                if (ob.getLayer() == l && ob.isVisible()) {
                     AffineTransform transform = gdraw.getTransform();
                     Stroke stroke = gdraw.getStroke();
                     if(ob instanceof Overlay){
@@ -205,6 +206,11 @@ public class Renderer extends JPanel{
                 Renderer.camera = camera;
             }
         });
+    }
+    
+    
+    public static Point mapToScene(Point point){
+        return new Point((int)(point.x-camera.x), (int)(point.y-camera.y));
     }
     
     public static ArrayList<Renderable> getRenderList() {

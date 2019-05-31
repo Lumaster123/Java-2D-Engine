@@ -9,6 +9,8 @@ import java.awt.geom.Point2D;
 
 public abstract class RenderableObject implements Renderable{
     
+    protected RenderableObject parent;
+    
     protected Layer layer;
     
     protected float relativeX, relativeY;
@@ -16,6 +18,8 @@ public abstract class RenderableObject implements Renderable{
     protected float width, height;
     protected float rotation;
 
+    protected boolean isVisible;
+    
     protected boolean drawCentered;
     
     public RenderableObject(Layer layer, float x, float y, float width, float height) {
@@ -26,6 +30,8 @@ public abstract class RenderableObject implements Renderable{
         this.y = y;
         this.width = width;
         this.height = height;
+        
+        isVisible = true;
         
         activateListener();
     }
@@ -39,12 +45,16 @@ public abstract class RenderableObject implements Renderable{
         }
     }
     
+    public void setParent(RenderableObject parent){
+        this.parent = parent;
+    }
+
+    public RenderableObject getParent() {
+        return parent;
+    }
+    
     public boolean isInObject(Point point){
-        float x = this.x, y = this.y;
-//        if(relativeX >= 0)
-//            x -= width/2;
-//        if(relativeY >= 0)
-//            y -= height/2;
+        float x = getPosition().x, y = getPosition().y;
         return point.x >= x && point.x <= x+width && point.y >= y && point.y <= y+height;
     }
     
@@ -53,11 +63,30 @@ public abstract class RenderableObject implements Renderable{
         return layer;
     }
     
+    public void setLayer(Layer layer){
+        this.layer = layer;
+    }
+    
     @Override
     public Point getPosition(){
+        float x = this.x, y = this.y;
+        if(parent != null){
+            x += parent.getPosition().x;
+            y += parent.getPosition().y;
+        }
         return new Point((int)x, (int)y);
     }
+    
+    
 
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+    
     public void setRelativeX(float relativeX) {
         this.relativeX = relativeX;
     }
@@ -100,6 +129,14 @@ public abstract class RenderableObject implements Renderable{
         return Math.toRadians(rotation);
     }
     
+    public int toInt(float f){
+        return (int)f;
+    }
+    
+    public int toInt(double d){
+        return (int)d;
+    }
+    
     @Override
     public Point2D getRelativePosition() {
         return new Point2D() {
@@ -140,6 +177,16 @@ public abstract class RenderableObject implements Renderable{
     public float getHeight() {
         return height;
     }
+
+    public void setVisible(boolean visible){
+        isVisible = visible;
+    }
+
+    @Override
+    public boolean isVisible() {
+        return isVisible;
+    }
+
 
     
     
